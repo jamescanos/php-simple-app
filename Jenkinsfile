@@ -13,6 +13,20 @@ pipeline {
             }
         }
 
+        stage('Generate Tag') {
+            steps {
+                script {
+                    // Crear un tag único basado en fecha + commit
+                    def GIT_COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    def DATE_TAG = sh(script: "date +%Y%m%d-%H%M%S", returnStdout: true).trim()
+                    def VERSION_TAG = "${DATE_TAG}-${GIT_COMMIT}"
+                    env.VERSION_TAG = VERSION_TAG
+
+                    echo "Versión generada: ${VERSION_TAG}"
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:latest .'
